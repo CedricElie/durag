@@ -244,7 +244,7 @@ There are two reasonable ways to get value from this project. They are alternati
 | Custom, self-hosted pipeline | LlamaIndex with Docling/Unstructured, PostgreSQL + pgvector or Qdrant, local or API models | Control over manual uploads, email sync, parsing, metadata, hybrid retrieval, and DevOps-specific workflows | More code, testing, upgrades, and operations |
 | Managed cloud/enterprise search | Azure AI Search / Azure AI services, AWS Bedrock-based architecture | Managed operations and integration with existing cloud governance | Cloud configuration and cost; document data is processed within the chosen provider boundary and must meet policy |
 
-**Recommendation for durag:** build the custom pipeline in small steps because multiple-source provenance, idempotent long-term intake, and spreadsheet-aware DevOps queries are central requirements. Use **MinIO for unmodified originals**, **PostgreSQL for metadata and lifecycle/event state**, and evaluate **PostgreSQL + pgvector versus Qdrant** for search. Use **LlamaIndex as an optional orchestration layer** and evaluate **Docling first for a local parser**. Begin with a CLI for reliable batch import and a simple service/API boundary that can later power drag-and-drop in a Web UI. Configure MinIO events to a durable queue or event service, with retries and reconciliation; do not introduce Airflow or Temporal for a single-user manual-sync MVP. Adopt a workflow engine only if retries, parallelism, or multiple sources justify it.
+**Recommendation for durag:** build the custom pipeline in small steps because multiple-source provenance, idempotent long-term intake, and spreadsheet-aware DevOps queries are central requirements. Deploy on a local Kubernetes cluster, fully packaged and configured via a unified Helm chart (`charts/durag`). Use **MinIO for unmodified originals**, **PostgreSQL for metadata and lifecycle/event state**, and evaluate **PostgreSQL + pgvector versus Qdrant** for search. Use **LlamaIndex as an optional orchestration layer** and evaluate **Docling first for a local parser**. Begin with a CLI for reliable batch import and a simple service/API boundary that can later power drag-and-drop in a Web UI. Configure MinIO events to a durable queue or event service, with retries and reconciliation; do not introduce Airflow or Temporal for a single-user manual-sync MVP. Adopt a workflow engine only if retries, parallelism, or multiple sources justify it.
 
 For immediate productivity before building, pilot a turnkey platform with a non-sensitive sample set and verify it can meet the same privacy, citation, Excel, manual upload, email-sync, backup, and deletion requirements.
 
@@ -265,3 +265,10 @@ For immediate productivity before building, pilot a turnkey platform with a non-
 3. **Parsing and local retrieval:** test parser quality; extract PDF/DOCX/XLSX structure; add versioned embeddings, persistent metadata, and hybrid retrieval; establish an evaluation corpus using both uploaded and email-sourced documents.
 4. **Grounded Q&A and summaries:** add citations, uncertainty handling, hierarchical summaries, and configurable Ollama/OpenAI API answer generation with explicit data-sharing controls.
 5. **Production operations:** add the second email provider, deletion/retention controls, backup/restore, monitoring, optional reranking, scheduled sync, and OCR/structured spreadsheet querying as requirements demand.
+
+→ For the detailed, step-by-step implementation plan and Helm packaging architecture across 9 phases, see [docs/wbs.md](wbs.md).
+
+## Contributors
+
+- [Cedric KOUEKAM](https://github.com/CedricElie)
+- [Guylaine NGOUDJO](https://github.com/ngoug)

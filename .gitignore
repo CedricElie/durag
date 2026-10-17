@@ -1,0 +1,155 @@
+# -----------------------------------------------------------------------------
+# User & Scratch Files
+# -----------------------------------------------------------------------------
+flow.mermaid
+gemini_notes.txt
+
+# -----------------------------------------------------------------------------
+# Secrets, Credentials, and Authentication Tokens
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+
+# Certificates, Keys & Passwords
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.kdbx
+
+# Cloud & API credentials (Google, Microsoft, AWS, MinIO, etc.)
+*credential*
+*credentials*.json
+client_secret*.json
+service_account*.json
+service-account*.json
+token.json
+tokens.json
+oauth*.json
+*.token
+*.secret
+
+# Kubernetes & Helm secrets
+kubeconfig*
+*.kubeconfig
+helm-secrets/
+*.dec
+*secret.yaml
+*secrets.yaml
+!charts/*/templates/*secret*.yaml
+
+# -----------------------------------------------------------------------------
+# Sensitive Operational Documents & Raw Ingestion Data
+# -----------------------------------------------------------------------------
+# Originals, uploaded files, and raw test documents
+data/
+originals/
+uploads/
+documents/
+raw_documents/
+sample_data/
+eval_corpus/
+
+# Document formats that may contain private/operational data
+*.pdf
+*.docx
+*.doc
+*.xlsx
+*.xls
+*.csv
+*.tsv
+*.pptx
+*.ppt
+*.msg
+*.eml
+
+# -----------------------------------------------------------------------------
+# Local Storage, Databases, and Backups
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.sql
+*.tar.gz
+*.bak
+
+# MinIO & Database local persistent volumes
+minio_data/
+postgres_data/
+qdrant_data/
+redis_data/
+ollama_models/
+
+# -----------------------------------------------------------------------------
+# Python Environments & Artifacts
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+.venv/
+venv/
+ENV/
+env/
+
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+
+# -----------------------------------------------------------------------------
+# Frontend & Node (Web UI)
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+out/
+
+# -----------------------------------------------------------------------------
+# IDE, Editors, and OS Metadata
+# -----------------------------------------------------------------------------
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

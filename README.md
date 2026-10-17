@@ -26,6 +26,7 @@
 | Parsing | Docling (evaluating); Unstructured and LlamaParse as alternatives |
 | LLM | Ollama (local default) / OpenAI API (optional) |
 | Orchestration | LlamaIndex (optional) |
+| Deployment | Kubernetes (packaged via Helm) |
 
 ## Architecture overview
 
@@ -55,14 +56,20 @@ Two main paths: a **write path** for collecting and indexing documents, and a **
 4. **Grounded Q&A** — citations, uncertainty, hierarchical summaries, Ollama/OpenAI answer generation
 5. **Production operations** — second provider, deletion/retention, backup, monitoring, OCR
 
-→ Details: [docs/architecture.md](docs/architecture.md#suggested-delivery-plan)
+→ Details: [docs/architecture.md](docs/architecture.md#suggested-delivery-plan) and implementation plan in [docs/wbs.md](docs/wbs.md)
 
 ## Getting started
 
 Design stage — no components to run yet. To contribute:
 
 1. Review the [architecture document](docs/architecture.md)
-2. Weigh in on the [open decisions](#open-decisions) above
+2. Review the [work breakdown structure (WBS)](docs/wbs.md)
+3. Weigh in on the [open decisions](#open-decisions) above
+
+## Contributors
+
+- [Cedric KOUEKAM](https://github.com/CedricElie)
+- [Guylaine NGOUDJO](https://github.com/ngoug)
 
 ## License
 
