@@ -1,6 +1,6 @@
 # durag
 
-**durag** is a private, long-lived knowledge base for operational documents. It collects supported PDF, Word, and Excel documents from email attachments and manual uploads, preserves their provenance, and makes them searchable for cited answers and summaries.
+**durag** is a private, long-lived, knowledge base for operational documents. It collects supported PDF, Word, and Excel documents from email attachments and manual uploads, preserves their provenance, and makes them searchable for cited answers and summaries.
 
 > **Status:** Design stage. No components are implemented yet. Do not add credentials or private documents to this repository.
 
