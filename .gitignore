@@ -37,10 +37,11 @@ oauth*.json
 kubeconfig*
 *.kubeconfig
 helm-secrets/
-*.dec
 *secret.yaml
 *secrets.yaml
 !charts/*/templates/*secret*.yaml
+!*secrets.example.yaml
+!*.enc.yaml
 
 # -----------------------------------------------------------------------------
 # Sensitive Operational Documents & Raw Ingestion Data

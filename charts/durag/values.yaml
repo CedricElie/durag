@@ -21,6 +21,19 @@ config:
     database: "durag"
     port: "5432"
 
+# Secrets management via SOPS / helm-secrets (Phase 0.8)
+secrets:
+  enabled: false
+  postgres:
+    password: ""
+  minio:
+    rootUser: ""
+    rootPassword: ""
+  llm:
+    openaiApiKey: ""
+    geminiApiKey: ""
+  extraSecrets: {}
+
 # Component toggles and settings (to be wired in subsequent phases)
 ingestion:
   enabled: false

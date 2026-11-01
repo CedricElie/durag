@@ -1,0 +1,11 @@
+# SOPS configuration for durag
+# Encrypts secret values in YAML files matching secrets*.yaml
+# Compatible with age keys (and optional PGP/KMS keys)
+
+creation_rules:
+  - path_regex: .*/secrets.*\.ya?ml$
+    # Encrypt only sensitive leaf values, leaving structural keys in plaintext
+    encrypted_regex: '^(password|rootPassword|rootUser|openaiApiKey|geminiApiKey|.*Key|.*Secret|.*Token|POSTGRES_PASSWORD|MINIO_ROOT_PASSWORD)$'
+    # Age public key recipients can be set here or via $SOPS_AGE_RECIPIENTS
+    # Example recipient:
+    # age: "age1..."

@@ -19,8 +19,8 @@ Set up the development environment, repository structure, local K8s cluster, and
 | 0.5 | Set up Python project structure (`pyproject.toml`, linting, tests) | Buildable Python package in `src/durag/` | — |
 | 0.6 | Create base multi-stage `Dockerfile` for durag services | Image tag strategy aligned with Helm `image.tag` values | 0.5 |
 | 0.7 | Set up Two-Tier validation strategy (Tier 1: fast local pre-flight runner `scripts/validate.sh`; Tier 2: GitHub Actions CI pipeline) | Local validation in <3s and green PR CI pipeline | 0.2, 0.6 |
-| 0.8 | Define Kubernetes secret management strategy for Helm (Sealed Secrets, SOPS/helm-secrets, or external-secrets) | Secrets workflow integrated with Helm values and documented | 0.2 |
-| 0.9 | Agree data policy: retention, backup targets, encryption-at-rest, model hosting | Signed-off policy document | — |
+| 0.8 | Implement Kubernetes secret management using SOPS / helm-secrets (with age encryption) | Secrets workflow integrated with Helm values (`.sops.yaml`, `templates/secrets.yaml`) and documented | 0.2 |
+| 0.9 | Agree data policy: retention, backup targets, encryption-at-rest, model hosting (PAUSED - deferred) | Signed-off policy document | — |
 
 **Exit criteria:** `helm lint charts/durag` passes; base chart installs via `helm upgrade --install durag ./charts/durag --namespace durag --create-namespace`; secrets and namespace quotas are managed declaratively.
 

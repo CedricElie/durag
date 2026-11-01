@@ -286,6 +286,78 @@ REVISION: 1
 TEST SUITE: None
 ```
 
+### 5.4 Secret Management with SOPS and helm-secrets (Phase 0.8)
+
+In `durag`, sensitive credentials (database passwords, MinIO root credentials, OpenAI/Gemini API keys, OAuth tokens) are never committed in plaintext. They are encrypted at rest using **SOPS** with **`age`** encryption and decrypted on-the-fly at deployment time.
+
+#### 1. Install `sops`, `age`, and `helm-secrets`
+* **Install SOPS and age (Linux):**
+  ```bash
+  # Install sops
+  curl -Lo ~/.local/bin/sops https://github.com/getsops/sops/releases/download/v3.9.4/sops-v3.9.4.linux.amd64
+  chmod +x ~/.local/bin/sops
+
+  # Install age
+  curl -Lo /tmp/age.tar.gz https://github.com/FiloSottile/age/releases/download/v1.2.1/age-v1.2.1-linux-amd64.tar.gz
+  tar -xzf /tmp/age.tar.gz -C /tmp && mv /tmp/age/age* ~/.local/bin/
+  chmod +x ~/.local/bin/age*
+  ```
+* **Install on macOS:**
+  ```bash
+  brew install sops age
+  ```
+* **Install the `helm-secrets` plugin:**
+  ```bash
+  helm plugin install https://github.com/jkroepke/helm-secrets --version v4.6.0
+  ```
+
+#### 2. Generate an `age` Key Pair
+Create your operator age key:
+```bash
+mkdir -p ~/.config/sops/age
+age-keygen -o ~/.config/sops/age/keys.txt
+```
+
+Extract the public key:
+```bash
+export SOPS_AGE_RECIPIENTS=$(grep "public key:" ~/.config/sops/age/keys.txt | awk '{print $NF}')
+echo "Your age public key: ${SOPS_AGE_RECIPIENTS}"
+```
+
+#### 3. Create and Encrypt Secrets File
+Copy the provided example template:
+```bash
+cp charts/durag/secrets.example.yaml charts/durag/secrets.yaml
+```
+
+Edit your credentials in `charts/durag/secrets.yaml`, then encrypt it in-place using SOPS:
+```bash
+sops -e -i charts/durag/secrets.yaml
+```
+
+> **SysAdmin Note:** In `charts/durag/secrets.yaml`, SOPS only encrypts the secret values matching the regex configured in `.sops.yaml`. Structural YAML keys remain readable for easy Git diffs, while values like passwords and API keys are completely protected.
+
+To view or edit the encrypted secrets in your editor:
+```bash
+sops charts/durag/secrets.yaml
+```
+
+#### 4. Deploy Helm Release with Decrypted Secrets
+Deploy using the `helm-secrets` plugin (or `sops exec-file`):
+```bash
+helm secrets upgrade --install durag ./charts/durag \
+  --namespace durag \
+  --create-namespace \
+  -f ./charts/durag/values-local.yaml \
+  -f ./charts/durag/secrets.yaml
+```
+
+#### 5. Verify the Secret in Kubernetes
+Confirm that the secret object was created in the `durag` namespace:
+```bash
+kubectl get secret durag-secrets -n durag
+```
+
 ---
 
 ## Step 6: Verify the Deployment
