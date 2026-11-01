@@ -60,11 +60,10 @@ Two main paths: a **write path** for collecting and indexing documents, and a **
 
 ## Getting started
 
-Design stage — no components to run yet. To contribute:
-
 1. Review the [architecture document](docs/architecture.md)
 2. Review the [work breakdown structure (WBS)](docs/wbs.md)
-3. Weigh in on the [open decisions](#open-decisions) above
+3. Follow the [Operator How-To Guide](docs/how-to.md) for step-by-step instructions to bootstrap, build, and deploy locally.
+4. Weigh in on the [open decisions](#open-decisions) above
 
 ## Contributors
 

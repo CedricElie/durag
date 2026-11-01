@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "durag.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "durag.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.config.logLevel | default "INFO" | quote }}
+  MINIO_BUCKET_NAME: {{ .Values.config.minio.bucket | default "durag-raw-documents" | quote }}
+  POSTGRES_DB: {{ .Values.config.postgres.database | default "durag" | quote }}
+  POSTGRES_HOST: {{ .Values.config.postgres.host | default (printf "%s-postgresql" (include "durag.fullname" .)) | quote }}
+  POSTGRES_PORT: {{ .Values.config.postgres.port | default "5432" | quote }}

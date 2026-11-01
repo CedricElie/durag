@@ -1,0 +1,124 @@
+# Default values for durag Helm chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+commonLabels: {}
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Shared application configuration
+config:
+  logLevel: "INFO"
+  minio:
+    bucket: "durag-raw-documents"
+  postgres:
+    database: "durag"
+    port: "5432"
+
+# Component toggles and settings (to be wired in subsequent phases)
+ingestion:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: "durag/ingestion"
+    pullPolicy: "IfNotPresent"
+    tag: ""
+  service:
+    type: "ClusterIP"
+    port: 8000
+  resources: {}
+
+consumer:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: "durag/consumer"
+    pullPolicy: "IfNotPresent"
+    tag: ""
+  resources: {}
+
+pollingWorker:
+  enabled: false
+  type: "Deployment" # Deployment or CronJob
+  schedule: "*/15 * * * *"
+  image:
+    repository: "durag/polling-worker"
+    pullPolicy: "IfNotPresent"
+    tag: ""
+
+query:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: "durag/query"
+    pullPolicy: "IfNotPresent"
+    tag: ""
+  service:
+    type: "ClusterIP"
+    port: 8001
+  resources: {}
+
+ui:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: "durag/ui"
+    pullPolicy: "IfNotPresent"
+    tag: ""
+  service:
+    type: "ClusterIP"
+    port: 3000
+  resources: {}
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: "durag.local"
+      paths:
+        - path: /
+          pathType: Prefix
+          service: "ui"
+        - path: /api/ingest
+          pathType: Prefix
+          service: "ingestion"
+  tls: []
+
+embedding:
+  enabled: false
+  image:
+    repository: "sentence-transformers/all-MiniLM-L6-v2"
+    tag: "latest"
+  resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Namespace resource quota management (Phase 0.4)
+resourceQuota:
+  enabled: false
+  hard:
+    requestsCpu: "4"
+    requestsMemory: "8Gi"
+    limitsCpu: "8"
+    limitsMemory: "16Gi"
+    pods: "30"
+
+# Namespace container default limits and requests (Phase 0.4)
+limitRange:
+  enabled: false
+  default:
+    cpu: "500m"
+    memory: "512Mi"
+  defaultRequest:
+    cpu: "100m"
+    memory: "128Mi"
+

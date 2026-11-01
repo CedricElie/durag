@@ -1,0 +1,16 @@
+# Patterns to ignore when packaging a chart.
+*.tgz
+.git/
+.gitignore
+.gitattributes
+.github/
+.vscode/
+.idea/
+*.swp
+*.bak
+*.tmp
+*~
+.DS_Store
+.terraform/
+.pytest_cache/
+__pycache__/

@@ -1,0 +1,22 @@
+# Local development overrides for kind / minikube (durag)
+# Fulfills Phase 0.2 local configuration guidelines
+
+config:
+  logLevel: "DEBUG"
+
+nodeSelector:
+  durag.io/node-type: "compute"
+
+# Enable resource quotas for local testing
+resourceQuota:
+  enabled: true
+  hard:
+    requestsCpu: "4"
+    requestsMemory: "8Gi"
+    limitsCpu: "8"
+    limitsMemory: "16Gi"
+    pods: "30"
+
+limitRange:
+  enabled: true
+

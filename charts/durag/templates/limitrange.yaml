@@ -1,0 +1,18 @@
+{{- if .Values.limitRange.enabled -}}
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ include "durag.fullname" . }}-limits
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "durag.labels" . | nindent 4 }}
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: {{ .Values.limitRange.default.cpu | default "500m" | quote }}
+        memory: {{ .Values.limitRange.default.memory | default "512Mi" | quote }}
+      defaultRequest:
+        cpu: {{ .Values.limitRange.defaultRequest.cpu | default "100m" | quote }}
+        memory: {{ .Values.limitRange.defaultRequest.memory | default "128Mi" | quote }}
+{{- end }}

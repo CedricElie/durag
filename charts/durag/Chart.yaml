@@ -1,0 +1,19 @@
+apiVersion: v2
+name: durag
+description: Private, long-lived operational knowledge base with verifiable provenance and hybrid RAG retrieval
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - rag
+  - search
+  - documents
+  - provenance
+  - minio
+  - pgvector
+home: https://github.com/CedricElie/durag
+maintainers:
+  - name: Cedric KOUEKAM
+    url: https://github.com/CedricElie
+  - name: Guylaine NGOUDJO
+    url: https://github.com/ngoug
