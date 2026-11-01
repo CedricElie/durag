@@ -40,8 +40,15 @@ if (($env:PATH -split ';') -notcontains $BinDir) {
     $env:PATH = "$BinDir;$env:PATH"
 }
 
-$Clusters = & kind get clusters 2>$null
-if (($LASTEXITCODE -eq 0) -and ($Clusters -contains $Name)) {
+$PreviousErrorActionPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = 'Continue'
+    $Clusters = & kind get clusters 2>$null
+    $ClusterQueryExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $PreviousErrorActionPreference
+}
+if (($ClusterQueryExitCode -eq 0) -and ($Clusters -contains $Name)) {
     Write-Host "[!] Cluster '$Name' already exists."
     Write-Host "    To delete and recreate it, run: kind delete cluster --name $Name"
     Write-Host "    Switching context to kind-$Name..."
@@ -51,9 +58,16 @@ if (($LASTEXITCODE -eq 0) -and ($Clusters -contains $Name)) {
 }
 
 Write-Host "[*] Ensuring local container registry '$RegistryName' is running on port $RegistryPort..."
-$RegistryRunning = & docker inspect -f '{{.State.Running}}' $RegistryName 2>$null
-if ($LASTEXITCODE -ne 0 -or $RegistryRunning -ne 'true') {
-    if ($LASTEXITCODE -eq 0) {
+$PreviousErrorActionPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = 'Continue'
+    $RegistryRunning = & docker inspect -f '{{.State.Running}}' $RegistryName 2>$null
+    $RegistryInspectExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $PreviousErrorActionPreference
+}
+if ($RegistryInspectExitCode -ne 0 -or $RegistryRunning -ne 'true') {
+    if ($RegistryInspectExitCode -eq 0) {
         & docker rm -f $RegistryName
         if ($LASTEXITCODE -ne 0) { throw 'Failed to remove the stopped registry container.' }
     }

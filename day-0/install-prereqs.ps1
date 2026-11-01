@@ -26,7 +26,12 @@ switch -Regex ($Architecture) {
 
 Write-Host "=== [durag / day-0] Checking prerequisites (windows/$Arch) ==="
 
-$DockerCommand = Get-Command docker -CommandType Application -ErrorAction SilentlyContinue
+$DockerCliPath = Join-Path $env:ProgramFiles 'Docker\Docker\resources\bin'
+$DockerCommand = Get-Command docker.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $DockerCommand -and (Test-Path (Join-Path $DockerCliPath 'docker.exe'))) {
+    $env:PATH = "$DockerCliPath;$env:PATH"
+    $DockerCommand = Get-Command docker.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+}
 if (-not $DockerCommand) {
     Write-Host '[!] Docker CLI not found. Installing Docker Desktop with winget...'
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
@@ -38,20 +43,29 @@ if (-not $DockerCommand) {
         throw "[-] Docker Desktop installation failed (winget exit code $LASTEXITCODE). Retry from an elevated PowerShell session or install Docker Desktop manually."
     }
 
-    $DockerCliPath = Join-Path $env:ProgramFiles 'Docker\Docker\resources\bin'
     if (Test-Path (Join-Path $DockerCliPath 'docker.exe')) {
         $env:PATH = "$DockerCliPath;$env:PATH"
     }
-    $DockerCommand = Get-Command docker -CommandType Application -ErrorAction SilentlyContinue
+    $DockerCommand = Get-Command docker.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $DockerCommand) {
         throw '[-] Docker Desktop was installed, but docker.exe is not available in PATH. Restart PowerShell and rerun the bootstrap.'
     }
 }
 
 $DockerExe = $DockerCommand.Source
+function Test-DockerEngine {
+    $PreviousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        & $DockerExe info *> $null
+        return $LASTEXITCODE -eq 0
+    } finally {
+        $ErrorActionPreference = $PreviousErrorActionPreference
+    }
+}
+
 $DockerInfoReady = $false
-& $DockerExe info *> $null
-if ($LASTEXITCODE -eq 0) {
+if (Test-DockerEngine) {
     $DockerInfoReady = $true
 } else {
     $DockerDesktopPath = Join-Path $env:ProgramFiles 'Docker\Docker\Docker Desktop.exe'
@@ -61,8 +75,7 @@ if ($LASTEXITCODE -eq 0) {
         Write-Host '[*] Waiting for the Docker engine to become ready (up to 5 minutes)...'
         for ($Attempt = 0; $Attempt -lt 60; $Attempt++) {
             Start-Sleep -Seconds 5
-            & $DockerExe info *> $null
-            if ($LASTEXITCODE -eq 0) {
+            if (Test-DockerEngine) {
                 $DockerInfoReady = $true
                 break
             }
