@@ -16,8 +16,9 @@ Every step includes the exact terminal command to run and the expected output to
 6. [Step 5: Deploy durag with Helm](#step-5-deploy-durag-with-helm)
 7. [Step 6: Verify the Deployment](#step-6-verify-the-deployment)
 8. [Step 7: Day-2 Operations and Maintenance](#step-7-day-2-operations-and-maintenance)
-9. [Step 8: Troubleshooting Common Issues](#step-8-troubleshooting-common-issues)
-10. [Step 9: Teardown & Clean Up](#step-9-teardown--clean-up)
+9. [Step 8: Pre-Push Verification Checklist for Chart Updates](#step-8-pre-push-verification-checklist-for-chart-updates)
+10. [Step 9: Troubleshooting Common Issues](#step-9-troubleshooting-common-issues)
+11. [Step 10: Teardown & Clean Up](#step-10-teardown--clean-up)
 
 ---
 
@@ -200,12 +201,6 @@ To guarantee that broken code or invalid Helm templates can never be committed:
 ./scripts/validate.sh --install-hook
 ```
 
-*Expected output:*
-```text
-[+] Git pre-commit hook installed to /path/to/durag/.git/hooks/pre-commit
-    Validation will now run automatically before every 'git commit'.
-```
-
 ---
 
 ## Step 4: Build and Publish the durag Container Image
@@ -377,7 +372,109 @@ kubectl describe resourcequota durag-quota -n durag
 
 ---
 
-## Step 8: Troubleshooting Common Issues
+## Step 8: Pre-Push Verification Checklist for Chart Updates
+
+Whenever you modify any file in `charts/durag/` (`Chart.yaml`, templates, or value files), **always execute this 6-step checklist before pushing to git**. This ensures your changes will pass remote CI and will not break running clusters.
+
+```
+[Edit Chart Files] 
+       │
+       ▼
+1. Run Tier-1 Validator      ──►  ./scripts/validate.sh
+       │
+       ▼
+2. Lint All Value Profiles   ──►  helm lint base & values-local
+       │
+       ▼
+3. Template Dry-Run & Parse  ──►  helm template ... | kubectl apply --dry-run=client
+       │
+       ▼
+4. Server Dry-Run on Cluster ──►  helm upgrade ... --dry-run=server
+       │
+       ▼
+5. Live Local Upgrade Test   ──►  helm upgrade ... (verify pod/resource health)
+       │
+       ▼
+6. Git Review & Push         ──►  git diff charts/durag && git push
+```
+
+### 8.1 Step 1: Run Tier-1 Local Pre-Flight Validator
+Execute the local runner to verify Python tests and basic Helm template validity in under 1 second:
+
+```bash
+./scripts/validate.sh
+```
+
+### 8.2 Step 2: Lint Across All Supported Value Profiles
+Verify that the chart is valid under both default values and environment-specific overrides:
+
+```bash
+# Lint default base values
+helm lint ./charts/durag
+
+# Lint local development values
+helm lint ./charts/durag -f ./charts/durag/values-local.yaml
+```
+
+*Expected output:* `1 chart(s) linted, 0 chart(s) failed`.
+
+### 8.3 Step 3: Dry-Run Template Rendering and Kubernetes Client Validation
+Render the chart with debug output and pipe it through `kubectl --dry-run=client` to ensure all generated YAML manifests are structurally valid:
+
+```bash
+helm template durag ./charts/durag -f ./charts/durag/values-local.yaml --debug | kubectl apply --dry-run=client -f -
+```
+
+*Expected output:*
+```text
+serviceaccount/durag configured (dry run)
+configmap/durag-config configured (dry run)
+resourcequota/durag-quota configured (dry run)
+limitrange/durag-limits configured (dry run)
+```
+
+> **SysAdmin Tip:** If template variables are missing or a Go template block has incorrect indentation, this command will catch the exact line number immediately.
+
+### 8.4 Step 4: Server-Side Dry-Run Against Live Cluster
+Validate how the actual Kubernetes API server interprets your changes against active admission controllers and schema definitions, without modifying cluster state:
+
+```bash
+helm upgrade durag ./charts/durag \
+  --namespace durag \
+  -f ./charts/durag/values-local.yaml \
+  --dry-run=server
+```
+
+### 8.5 Step 5: Live Upgrade & Cluster Health Check
+Apply the chart upgrade to your local `kind` cluster and verify that resources deploy cleanly:
+
+```bash
+# Apply upgrade
+helm upgrade durag ./charts/durag \
+  --namespace durag \
+  -f ./charts/durag/values-local.yaml
+
+# Verify release revision and resources
+helm status durag -n durag
+kubectl get all,configmap,resourcequota,limitrange -n durag
+```
+
+Ensure no pods enter `CrashLoopBackOff`, `ImagePullBackOff`, or `OOMKilled`.
+
+### 8.6 Step 6: Git Diff Review and Safe Push
+Check the exact diff in `charts/durag` to confirm only intended changes are staged, with no secrets or accidental edits:
+
+```bash
+git diff charts/durag
+git status
+git add charts/durag/
+git commit -m "fix(helm): <describe your chart change>"
+git push origin <your-branch>
+```
+
+---
+
+## Step 9: Troubleshooting Common Issues
 
 ### Issue 1: "Bind for 0.0.0.0:80 failed: port is already allocated"
 * **Cause:** Another service on the Linux host (e.g., Apache, NGINX, or a Docker web server) is already listening on port 80.
@@ -403,9 +500,9 @@ kubectl describe resourcequota durag-quota -n durag
 
 ---
 
-## Step 9: Teardown & Clean Up
+## Step 10: Teardown & Clean Up
 
-### 9.1 Uninstall the Helm Release
+### 10.1 Uninstall the Helm Release
 To remove the application and namespace resources:
 
 ```bash
@@ -413,7 +510,7 @@ helm uninstall durag -n durag
 kubectl delete namespace durag
 ```
 
-### 9.2 Delete the Kind Cluster
+### 10.2 Delete the Kind Cluster
 To destroy the local Kubernetes cluster while keeping the local registry container (so cached images are preserved):
 
 ```bash
