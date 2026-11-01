@@ -35,7 +35,7 @@ Before running the scripts:
   * [Windows Package Manager (`winget`)](https://learn.microsoft.com/windows/package-manager/winget/) for automatic Docker Desktop installation. Docker Desktop installation may require administrator approval, WSL 2, virtualization support, or a restart.
   * Windows PowerShell 5.1 or PowerShell 7.
 
-*Note: The prerequisite scripts check for Docker, `kubectl`, `helm`, and `kind`. On Windows, missing Docker Desktop is installed through `winget`, then started and checked for engine readiness. Missing `kubectl`, Helm, and kind are downloaded to `$HOME\.local\bin`, which is added to PATH for the current PowerShell session. Docker Desktop installation can require elevation, WSL 2, virtualization support, or a restart; the bootstrap reports an error if Windows needs setup before Docker can start. Automatic `kind` installation on Windows currently requires x64; on Windows ARM64, install `kind` separately and make it available in PATH or `$HOME\.local\bin`.*
+*Note: The prerequisite scripts check for Docker, `kubectl`, `helm`, and `kind`. On Windows, missing Docker Desktop is installed through `winget`, then started and checked for engine readiness. Missing `kubectl`, Helm, and kind are downloaded to `$HOME\.local\bin`, which is added to the current session and your user PATH; open a new terminal to use the tools there. Docker Desktop installation can require elevation, WSL 2, virtualization support, or a restart; the bootstrap reports an error if Windows needs setup before Docker can start. Automatic `kind` installation on Windows currently requires x64; on Windows ARM64, install `kind` separately and make it available in PATH or `$HOME\.local\bin`.*
 
 ---
 

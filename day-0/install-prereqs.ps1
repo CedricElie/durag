@@ -13,6 +13,12 @@ $BinDirWasOnPath = ($env:PATH -split ';') -contains $BinDir
 if (-not $BinDirWasOnPath) {
     $env:PATH = "$BinDir;$env:PATH"
 }
+$UserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+$BinDirAddedToUserPath = ($UserPath -split ';') -notcontains $BinDir
+if ($BinDirAddedToUserPath) {
+    $UserPath = if ($UserPath) { "$UserPath;$BinDir" } else { $BinDir }
+    [Environment]::SetEnvironmentVariable('Path', $UserPath, 'User')
+}
 $Architecture = $env:PROCESSOR_ARCHITECTURE
 if ($env:PROCESSOR_ARCHITEW6432) {
     $Architecture = $env:PROCESSOR_ARCHITEW6432
@@ -130,8 +136,8 @@ if (-not (Get-Command kind -ErrorAction SilentlyContinue)) {
     Write-Host '[+] kind is already installed'
 }
 
-if (-not $BinDirWasOnPath) {
-    Write-Host "[!] Added $BinDir to PATH for this PowerShell session. Add it to your user PATH to persist it."
+if ($BinDirAddedToUserPath) {
+    Write-Host "[+] Added $BinDir to your user PATH. Open a new terminal to use installed tools."
 }
 
 Write-Host "=== [durag / day-0] All prerequisites satisfied! ==="
